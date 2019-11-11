@@ -281,7 +281,7 @@ fi
 #**************************************************************
 # Start the players-api server
 #**************************************************************
-${WORKSPACE}/bin/players-api --port 12001 &
+${WORKSPACE}/bin/players-api --port 12002 &
 pid=$!
 echo "${pid}" > pid.txt
 
