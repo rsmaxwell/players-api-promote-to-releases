@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ssh server scripts/update-players-api-wrapper
