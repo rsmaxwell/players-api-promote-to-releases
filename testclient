@@ -1,0 +1,134 @@
+#!/bin/bash
+
+ENDPOINT="http://localhost:${PORT}/players-api"
+
+OPTIONS="--silent --cookie cookie-jar.txt --cookie-jar cookie-jar.txt --dump-header - -k"
+
+echo "------------------------------------------------------------------"
+echo "Register"
+
+COMMAND="/users/register"
+
+cat > data.json <<EOT
+{  
+    "userID": "007",
+    "firstname": "James",
+    "lastname": "Bond",
+    "email": "james@mi6.co.uk",
+    "password": "topsecret"
+}
+EOT
+cat data.json
+
+curl ${OPTIONS} -X POST ${ENDPOINT}${COMMAND} \
+--header "Content-Type: application/json" \
+--data-binary @data.json
+
+echo "------------------------------------------------------------------"
+echo "Authenticate"
+
+COMMAND="/users/authenticate"
+USERID="007"
+PASSWORD="topsecret"
+
+curl ${OPTIONS} -X POST -u "${USERID}:${PASSWORD}" ${ENDPOINT}${COMMAND} \
+--header "Content-Type: application/json" \
+--header "Accept: application/json"
+
+echo "------------------------------------------------------------------"
+echo "Register"
+
+COMMAND="/users/register"
+
+cat > data.json <<EOT
+{  
+    "userID": "alice",
+    "firstname": "Alice",
+    "lastname": "Wonderland",
+    "email": "alice@abc.com",
+    "password": "wonder"
+}
+EOT
+cat data.json
+
+curl ${OPTIONS} -X POST ${ENDPOINT}${COMMAND} \
+--header "Content-Type: application/json" \
+--data-binary @data.json
+
+echo "------------------------------------------------------------------"
+echo "Update Person Role"
+
+COMMAND="/users/role/alice"
+
+cat > data.json <<EOT
+{
+    "role": "normal"
+}
+EOT
+cat data.json
+
+curl ${OPTIONS} -X PUT ${ENDPOINT}${COMMAND} \
+--header "Content-Type: application/json" \
+--header "Accept: application/json" \
+--data-binary @data.json
+
+echo "------------------------------------------------------------------"
+echo "Update Person Player"
+
+COMMAND="/users/player/alice"
+
+cat > data.json <<EOT
+{
+    "player": true
+}
+EOT
+cat data.json
+
+curl ${OPTIONS} -X PUT ${ENDPOINT}${COMMAND} \
+--header "Content-Type: application/json" \
+--header "Accept: application/json" \
+--data-binary @data.json
+
+echo "------------------------------------------------------------------"
+echo "Read Person - alice"
+
+COMMAND="/users/alice"
+
+curl ${OPTIONS} -X GET ${ENDPOINT}${COMMAND} \
+--header "Content-Type: application/json" \
+--header "Accept: application/json" \
+--output output.txt 
+
+jq . output.txt
+
+echo "------------------------------------------------------------------"
+echo "Read People"
+
+COMMAND="/users"
+
+cat > data.json <<EOT
+{
+    "filter": [
+        "admin",
+        "normal",
+        "suspended"
+    ]
+}
+EOT
+cat data.json
+
+curl ${OPTIONS} -X GET ${ENDPOINT}${COMMAND} \
+--header "Content-Type: application/json" \
+--header "Accept: application/json" \
+--data-binary @data.json
+
+echo "------------------------------------------------------------------"
+echo "Logout"
+
+COMMAND="/users/logout"
+
+curl ${OPTIONS} -X GET ${ENDPOINT}${COMMAND} \
+--header "Content-Type: application/json" \
+--header "Accept: application/json"
+
+echo "------------------------------------------------------------------"
